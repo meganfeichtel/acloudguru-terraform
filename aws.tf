@@ -13,7 +13,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-#creates s3 bucket
+#creates main s3 bucket
 resource "aws_s3_bucket" "b" {
   bucket = "acloudguru-2019-mfeichtel"
   acl    = "private"
@@ -23,8 +23,7 @@ resource "aws_s3_bucket" "b" {
     Environment = "Dev"
   }
 }
-
-#puts an object in s3 bucket
+#puts an object in main s3 bucket
 resource "aws_s3_bucket_object" "object" {
   bucket = "acloudguru-2019-mfeichtel"
   key    = "awsconsole.png"
@@ -32,6 +31,26 @@ resource "aws_s3_bucket_object" "object" {
   etag = "${filemd5("./files/awsconsole.png")}"
 }
 
+
+# #creates versioned s3 bucket
+# resource "aws_s3_bucket" "b" {
+#   bucket = "acloudguru-2019-mfeichtel-versioned"
+#   acl    = "private"
+#   tags = {
+#     Name        = "Megan s3 bucket for A Cloud Guru versioning labs"
+#     Environment = "Dev"
+#   }
+
+#   versioning {
+#     enabled = true
+#   }
+# }
+# #puts an object in versioned s3 bucket
+# resource "aws_s3_bucket_object" "object" {
+#   bucket = "acloudguru-2019-mfeichtel-versioned"
+#   key    = "helloworld.txt"
+#   source = "./files/helloworld.txt"
+# }
 
 
 #creates an ec2 resource
