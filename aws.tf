@@ -13,45 +13,36 @@ provider "aws" {
   region = "us-east-1"
 }
 
+#security group
+resource "aws_security_group" "webdmz" {
+  name        = "webDMZ"
+  description = "Allow demilitarized zone"
+  vpc_id      = "vpc-fbde4a81"
 
-#creates versioned s3 bucket
-resource "aws_s3_bucket" "bucket" {
-  bucket = "acloudguru-2019-mfeichtel-versioned"
-  acl    = "private"
-
-  tags = {
-    Name        = "Megan s3 bucket for A Cloud Guru versioning labs"
-    Environment = "Dev"
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  versioning {
-    enabled = true
-  }
-
-#this will add lifecycle rules for previous versions of files
-  lifecycle_rule {
-    # prefix  = "*" #limits to individual subdirs; if removed, lifecycle policy set to whole bucket
-    enabled = true
-
-    noncurrent_version_transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
-
-    noncurrent_version_transition {
-      days          = 60
-      storage_class = "GLACIER"
-    }
-
-    noncurrent_version_expiration {
-      days = 90
-    }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 }
 
-#puts an object in versioned s3 bucket
-resource "aws_s3_bucket_object" "object" {
-  bucket = "acloudguru-2019-mfeichtel-versioned"
-  key    = "helloworld.txt"
-  source = "./files/helloworld.txt"
+# creates an ec2 resource
+resource "aws_instance" "example" {
+  ami = "ami-06b382aba6c5a4f2c"
+  instance_type = "t2.micro"
+  tags {
+    Name = "megan-feichtel-test-instance-01"
+    Department = "Developers"
+    EmployeeID = "01"
+  }
+  disable_api_termination = true
+  security_groups = ["${aws_security_group.webdmz.id}"]
 }
